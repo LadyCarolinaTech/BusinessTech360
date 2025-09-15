@@ -1,0 +1,197 @@
+/* ======= ESTILOS GENERALES ======= */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+/* ======= ENCABEZADO ======= */
+header {
+    background-color: #002855; /* Azul corporativo oscuro */
+    color: white;
+    padding: 8px 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+}
+
+/* ======= MENÚ DE NAVEGACIÓN ======= */
+nav {
+    background-color: #004080; /* Azul más claro */
+    display: flex;
+    justify-content: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 14px 20px;
+    display: block;
+    font-weight: bold;
+}
+
+nav a:hover {
+    background-color: #0066cc;
+}
+
+/* ======= SECCIONES ======= */
+section {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px;
+    background: white;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ======= TÍTULOS ======= */
+h2 {
+    color: #004080;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #004080;
+}
+
+/* ======= BOTONES ======= */
+button {
+    background-color: #004080;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0066cc;
+}
+
+/* ======= FORMULARIOS ======= */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input, select, textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+textarea {
+    resize: none;
+}
+
+/* ======= IMÁGENES ======= */
+img {
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+    border: 3px solid #004080;
+    max-width: 100%;
+}
+
+/* ======= TABLAS ======= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #004080;
+    color: white;
+}
+
+/* ======= MODAL FLOTANTE ======= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 0;                 /* sin margen */
+  border-radius: 0;          /* esquinas cuadradas */
+  width: 100vw;              /* ancho completo */
+  height: 100vh;             /* alto completo */
+  max-width: none;           /* sin límite */
+  padding: 20px;             /* espacio interno */
+  box-sizing: border-box;    /* para que el padding no deforme */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover {
+    color: black;
+    cursor: pointer;
+}
+
+/* ======= PIE DE PÁGINA ======= */
+footer {
+    background-color: #002855;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+/* Botones normales */
+button, .btn {
+    padding: 8px 16px;       /* Ajusta el relleno interno */
+    font-size: 14px;         /* Tamaño de letra más moderado */
+    border-radius: 6px;      /* Bordes redondeados */
+    min-width: auto;         /* Evita que se estiren demasiado */
+    max-width: 180px;        /* Tamaño máximo de ancho */
+    white-space: nowrap;     /* Evita que el texto se parta */
+}
+
+/* Si tus botones son enlaces con clase "btn" */
+a.btn {
+    display: inline-block;
+    text-align: center;
+}
+/* Fuerza el tamaño moderado de todos los botones */
+button, 
+.btn, 
+input[type="button"], 
+input[type="submit"] {
+    padding: 6px 14px !important;    /* Menos relleno interno */
+    font-size: 14px !important;      /* Letra más pequeña */
+    border-radius: 6px !important;   /* Bordes suaves */
+    max-width: 160px !important;     /* Ancho máximo */
+    min-width: auto !important;      /* No se estiren innecesariamente */
+    white-space: nowrap !important;  /* Que no salte línea el texto */
+    display: inline-block !important;
+}
+

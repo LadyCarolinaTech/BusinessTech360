@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BusinessTech 360 - Información Corporativa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ====== Estilos  ====== -->
+  <style>
+    /* --- Variables y base --- */
+    :root{
+      --bg:#f4f6f8; --card:#fff; --accent:#003366; --accent-2:#00528c; --muted:#6b7280;
+      --radius:12px; --shadow: 0 8px 30px rgba(3,20,40,0.06);
+      font-family: 'Segoe UI', sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:30px;background:linear-gradient(180deg,#fbfdff 0%,var(--bg) 100%);color:#243449}
+    header{text-align:center;margin-bottom:10px}
+    header h1{color:var(--accent);font-size:2.5em;margin-bottom:5px; margin-top:10px;}
+    header img {max-width: 100%;height: auto;border-radius: 10px;margin-bottom: 10px;}
+
+    /* details/summary (estructura) */
+    details{background:var(--card);border:1px solid rgba(3,20,40,0.04);border-radius:10px;margin-bottom:15px;box-shadow:var(--shadow)}
+    summary{padding:15px;font-weight:bold;font-size:1.05em;cursor:pointer;color:var(--accent-2)}
+    summary:hover{color:var(--accent)}
+    details[open] summary{color:var(--accent)}
+    details p{padding:0 15px 15px 15px;margin:0;color:#334556}
+
+    .valor{padding:10px 15px;margin:5px 15px;border-radius:8px}
+    .valor strong{color:var(--accent)}
+
+    .subsection{margin-left:20px}
+    .hidden{display:none}
+
+    .form-container{background:var(--card);border:1px solid rgba(3,20,40,0.04);border-radius:10px;padding:20px;margin-top:20px;box-shadow:var(--shadow)}
+    .form-container input,.form-container textarea{width:100%;padding:8px;margin:10px 0;border-radius:6px;border:1px solid #dbe9f6}
+    .form-container label{font-weight:bold;margin-bottom:5px;display:block;color:var(--accent)}
+    .form-container input[type=submit]{background:linear-gradient(180deg,var(--accent) 0%,var(--accent-2) 100%);color:white;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+
+    /* Títulos azules para Contacto y FAQ */
+    .titulo-azul{color:var(--accent);margin:8px 0 6px}
+    .subtitulo-azul{color:var(--accent-2);margin:0 0 12px;font-weight:600}
+
+    /* Imagen centrada con borde */
+    .imagen-wrapper{display:flex;justify-content:center;padding:0 0 0 0;}
+    .imagen-centrada-borde{border-radius:12px;border:1px solid rgba(3,20,40,0.06);padding:4px;max-width:420px;box-shadow:0 8px 28px rgba(3,20,40,0.04);background:white}
+
+    /* FAQ section */
+    .faq-section{background:var(--card);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+
+    /* Responsive helper */
+    @media (max-width:900px){
+      body{padding: 18px;}
+      .imagen-centrada-borde{max-width:90%}
+    }
+
+    /* ========== Modal / Proyecciones Estratégicas 360 ========== */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:200}
+    .modal.show{display:flex}
+    .modal-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,6,23,0.35),rgba(3,20,40,0.45));backdrop-filter:blur(4px)}
+    .modal-panel{position: relative;z-index: 210;width: 95%;max-width: 1200px;max-height: 90vh;border-radius: 14px;background: var(--card);overflow-y: auto;box-shadow: 0 30px 80px rgba(3,20,40,0.25);display: flex;flex-direction: column;}
+    .modal-right{padding-left: 0;padding-top: 12px;}
+    .modal-close{position:absolute;right:14px;top:12px;border:0;background:transparent;font-size:26px;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px}
+    .modal-close:hover{color:var(--accent)}
+
+    /* Bienvenida */
+    .modal-section{padding:26px 30px}
+    .modal-title{margin:0;color:var(--accent);font-size:1.6rem}
+    .modal-subtitle{color:var(--muted);margin:10px 0 18px;line-height:1.5}
+    #bienvenidaProyecciones{background:linear-gradient(180deg, rgba(0,82,140,0.06), rgba(0,82,140,0.02));display:flex;flex-direction:column;align-items:center;gap:12px;justify-content:center;text-align:center;padding:30px;border-bottom:1px solid rgba(3,20,40,0.03)}
+    #bienvenidaProyecciones .modal-img img{max-width:360px;border-radius:10px;border:1px solid rgba(3,20,40,0.04);background:white;padding:6px}
+
+    .modal-actions{display:flex;gap:10px;margin-top:10px}
+
+    /* Contenido principal del modal cuando se muestran indicadores */
+    #contenedorIndicadores{display: flex;gap: 18px;padding: 18px 26px;flex: 1;max-height: 70vh;overflow-y: hidden;}
+    .modal-left{width: 30%;border-right: 1px solid rgba(3,20,40,0.04);padding-right: 18px;max-height: 70vh;overflow-y: auto;}
+    .modal-right{flex: 1;padding-left: 18px;max-height: 70vh;overflow-y: auto;}
+
+    .lista-categorias{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+    .lista-categorias li{background:linear-gradient(180deg, rgba(0,82,140,0.02), transparent);padding:10px;border-radius:10px;border:1px solid rgba(3,20,40,0.04);cursor:pointer;font-weight:700;color:var(--accent-2)}
+    .lista-categorias li:hover{transform:translateY(-3px)}
+    .lista-categorias li.active{background:linear-gradient(180deg,var(--accent) 0%,var(--accent-2) 100%);color:white;box-shadow:var(--shadow)}
+
+    .lista-indicadores{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .ind-item{padding:10px;border-radius:8px;border:1px solid rgba(3,20,40,0.04);background:white;cursor:pointer}
+    .ind-item:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+    .ind-item small{display:block;color:var(--muted);margin-top:6px;font-weight:500}
+
+    .form-indicador{margin-top:18px;background:linear-gradient(180deg,#fff,rgba(0,0,0,0.01));padding:14px;border-radius:10px;border:1px solid rgba(3,20,40,0.03)}
+    .form-indicador .campo{display:flex;flex-direction:column;margin-bottom:10px}
+    .form-indicador label{font-weight:700;color:#24414a;margin-bottom:6px}
+    .form-indicador input[type="number"], .form-indicador input[type="text"], .form-indicador select{padding:10px;border-radius:8px;border:1px solid #e6eef6;background:transparent;width:100%}
+
+    .form-actions{display:flex;gap:8px;margin-top:12px}
+    .btn-primario{background:linear-gradient(180deg,var(--accent) 0%,var(--accent-2) 100%);color:white;padding:10px 16px;border-radius:10px;border:0;cursor:pointer}
+    .btn-secundario{background:transparent;border:1px solid rgba(3,20,40,0.06);padding:10px;border-radius:10px;color:var(--accent-2);cursor:pointer}
+
+    .resultado-indicador{margin-top:16px;padding:12px;border-radius:8px;background:linear-gradient(180deg,rgba(16,113,96,0.06),transparent);border:1px solid rgba(16,113,96,0.08)}
+    .resultado-indicador .valor-resultado{font-weight:800;color:#07323b;font-size:1.2rem}
+    .resultado-indicador .interpretacion{margin-top:8px;color:#12323a}
+
+    @media (max-width:980px){
+      .modal-panel{max-width:940px}
+      #contenedorIndicadores{flex-direction:column;padding:14px}
+      .modal-left{width:100%;border-right:0;padding-right:0}
+      .modal-right{padding-left:0}
+    }
+
+    /* small helpers */
+    .small{font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+  <!-- ====== === === HTML ORIGINAL === === ====== -->
+  <header>
+    <h1>BusinessTech 360</h1>
+    <img src="simulador.jpg" alt="Gemelo Digital">
+    <p>Este simulador empresarial integra un gemelo digital avanzado que utiliza IA generativa para  proyectar, evaluar e interpretar datos empresariales que faciliten la formulación de planes de acción que fortalezcan la propuesta de valor empresarial.</p>
+
+  </header>
+
+  <!-- Menú de navegación con lista desplegable -->
+  <details>
+    <summary>Explora 360</summary>
+    <div class="subsection">
+      <details>
+        <summary>Nuestra esencia corporativa</summary>
+        <div class="subsection">
+          <details>
+            <summary>¿Quiénes somos?</summary>
+            <p>BusinessTech 360 es un simulador empresarial inteligente, intuitivo y poderso que opera como un gemelo digital que proyecta el balance general, el estado de resultados y los principales indicadores clave de desempeño. Confiamos en el poder de la tecnología para transformar la gestión empresarial mediante herramientas financieras innovadoras que permitan a los emprendedores y pequeños empresarios tener una vision real y proyectada de su negocio sin necesidad de conocimientos contables avanzados.</p>
+          </details>
+          <details>
+            <summary>Visión</summary>
+            <p>Ser una plataforma tecnológica de alto impacto que convierte datos en decisiones estratégicas e impulsa la transformación digital de emprendimientos y microempresas mediante soluciones integrales innovadoras.</p>
+          </details>
+          <details>
+            <summary>Misión</summary>
+            <p>Proveer soluciones digitales innovadoras que simulen el entorno organizacional a través de herramientas de visualización estratégica, proyección de estados financieros y monitoreo de indicadores clave de desempeño.</p>
+          </details>
+          <details>
+            <summary>Valores Corporativos</summary>
+            <div class="valor"><strong>Innovación:</strong> Impulsamos el uso de tecnologías emergentes para transformar la gestión empresarial.</div>
+            <div class="valor"><strong>Precisión:</strong> Nos guiamos por métricas fiables y datos objetivos.</div>
+            <div class="valor"><strong>Transparencia:</strong> Fomentamos la claridad en la visualización de resultados y procesos.</div>
+            <div class="valor"><strong>Adaptabilidad:</strong> Respondemos ágilmente a los cambios del entorno corporativo.</div>
+            <div class="valor"><strong>Excelencia:</strong> Buscamos el máximo rendimiento a través de la mejora continua.</div>
+            <div class="valor"><strong>Sostenibilidad:</strong> Actuamos de forma responsable con el medio ambiente y la sociedad.</div>
+            <div class="valor"><strong>Respeto:</strong> Tratamos a todas las personas con dignidad y cortesía.</div>
+            <div class="valor"><strong>Integridad:</strong> Actuamos con honestidad y ética en todo momento.</div>
+          </details>
+          <details>
+            <summary>Equipo de trabajo</summary>
+            <p>En BusinessTech 360 reconocemos que el capital humano es el eje de la transformación empresarial. De esta manera, cada integrante del equipo aporta competencias clave para el desarrollo de algoritmos que estructuran y replican la dinámica de una organización en escenarios empresariales reales.</p>
+          </details>
+        </div>
+      </details>
+
+      <details>
+        <summary>Propuesta de valor</summary>
+        <p>En businessTech 360 ofrecemos soluciones tecnológicas de alto impacto al alcance de tu negocio, sin importar su tamaño. Transformamos los datos en decisiones inteligentes con una visión integral de 360°, convirtiéndonos en el aliado digital que impulsa la productividad, la eficiencia y el desarrollo sostenible de tu empresa.</p>
+      </details>
+
+      <details>
+        <summary>Nuestro impacto</summary>
+        <p>En BusinessTech 360 creemos que la tecnología solo tiene sentido cuando genera resultados, por lo tanto ponemos el poder de la tecnología al servicio de tu negocio. Nuestro impacto se refleja en emprendimientos y microempresas más productivas, rentables y competitivas que convierten la innovación tecnológica en un aliado estratégico que facilita la toma decisiones en tiempo real.
+          </p>
+      </details>
+
+      <details>
+        <summary>Aliados estratégicos</summary>
+        <p>En BusinessTech 360 integramos tecnología e impulsamos empresas, por eso hacemos parte del Clúster TI, una red de empresas y actores estratégicos en tecnologías de la información en Santander. Donde promovemos el acceso a la innovación tecnológica, la transformación digital y mercados emergentes.  Esta red de aliados nos permite ofrecer soluciones más completas y generar un impacto real en la evolución tecnológica empresarial.</p>
+      </details>
+
+      <details>
+        <summary>Responsabilidad social empresarial</summary>
+        <p>En BusinessTech 360 creemos que la tecnología no tiene límites cuando se orienta al bien común, por eso: impulsamos la transformación digital de microempresas para fortalecer la economía regional; promovemos el uso responsable de la tecnología y la formación en gestión digital como herramientas de impacto social; apoyamos el emprendimiento local mediante mentorías y soluciones digitales accesibles y ponemos la innovación al servicio de causas sociales, educativas y comunitarias.</p>
+      </details>
+
+      <details>
+        <summary>Sostenibilidad</summary>
+        <p>En BusinessTech 360 creemos que la innovación tecnológica debe ir de la mano con el desarrollo responsable, de manera que: impulsamos la competitividad empresarial con soluciones tecnológicas sostenibles en el tiempo; apoyamos a las empresas a crecer de manera rentable y responsable mediante la transformación digital; impulsamos la economía circular a través de la reutilización y reciclaje responsable de equipos tecnológicos; promovemos soluciones digitales que reducen el consumo de papel y recursos físicos y fomentamos el uso de herramientas tecnológicas que disminuyen la huella de carbono empresarial.</p>
+      </details>
+
+      <details>
+        <summary>Portafolio empresarial</summary>
+        <img src="kpi.PNG" alt="Soluciones Inteligentes" class="imagen-centrada-borde" style="display: block; margin: 20px auto; border-radius: 20px; width: 300px; height: auto;"><br>
+        <p>En BusinessTech 360 transformamos los números en conocimiento y los datos en decisiones estratégicas. Nuestra plataforma permite simular escenarios y medir el rendimiento empresarial mediante métricas estratégicas. Estos indicadores proporcionan información cuantificable que se puede utilizar en todas las areas de la organización.</p>
+        <div class="subsection">
+          <p><strong>KPIs de Ventas:</strong> Miden el rendimiento comercial de una empresa, permite evaluar la efectividad de las estrategias de ventas, la productividad del equipo y el grado de cumplimineto de las metas establecidas. Son fundamentales para tomar decisiones que optimicen los recursos del negocio.</p>
+          <p><strong>KPIs de Redes Sociales:</strong> Miden el impacto, alcance y efectividad de las acciones realizadas en las plataformas sociales de una empresa u organización. Su propósito es evaluar si la estrategia digital contribuye al crecimiento de marca, la interacción con la audiencia y el logro de objetivos comerciales y comunicativos.</p>
+          <p><strong>KPIs de Retail:</strong> Miden y evalúan: la eficiencia operacional, la rentabilidad de los productos y la experiencia del cliente de un negocio de venta al por menor. Son esenciales para tomar decisiones estratégicas en precios, inventario, marketing y ventas que impulsen el crecimiento y la competitividad en el mercado minorista.</p>
+          <p><strong>KPIs de Logística:</strong> Miden la eficiencia, costos, tiempos y calidad en la cadena de suministro y transporte de productos. También permiten identificar cuellos de botella, optimizar rutas de transporte, mejorar la gestión de inventarios y garantizar que los procesos logísticos apoyen los objetivos estratégicos de la empresa.</p>
+          <p><strong>KPIs de Producción:</strong> Miden la eficiencia, calidad y costos de los procesos productivos dentro de una empresa. Facilitan la toma de decisiones para aumentar la productividad, reducucir costos y mejorar la competitividad de la empresa.</p>
+          <p><strong>KPIs Financieros:</strong> analizan la salud económica y la rentabilidad de la empresa. Ayudan a los directivos a a anticipar problemas financieros y a tomar decisiones estratégicas sobre inversiones, financiamiento y planificación finaciera, garantizando la sostenibilidad y el crecimiento del negocio.</p>
+          <p><strong>KPIs de Marketing digital:</strong> Miden la efectividad de las estrategias de marketing, son fundamentales para optimizar recursos, mejorar la comunicación con el público y aumentar la visivibilidad y las ventas de la empresa.</p>
+          <p><strong>KPIs de Recursos humanos:</strong> Miden, analizan y optimizan la gestión del capital humano en una organización. Estos indicadores ayudan a evaluar la eficiencia, productividad, satisfacción y desarrollo de los empleados, así como la efectividad de las políticas y procesos de RRHH.</p>
+          <p><strong>KPIs de Atención al Cliente:</strong> Miden la satisfacción, eficiencia y calidad del servicio al cliente. Facilitan la mejora continua de los procesos de atención y fortalecen la relación con los clientes.</p>
+          <p><strong>KPIs de Sostenibilidad:</strong> Evalúan el el impacto ambiental, social y económico de la empresa. Son fundamentales para guiar decisiones que promuevan prácticas sostenibles y la reputación corporativa.</p>
+          <p><strong>KPIs de Innovación:</strong> Miden la capacidad de la empresa para generar nuevas ideas, productos, procesos o servicios. Ayudan a fomentar la competitividad y el crecimiento sostenible de la organización mediante la adopción de nuevas tecnologías.</p>
+          <p><strong>KPIs de Ciberseguridad:</strong> Miden la protección de los sistemas de información y datos de la empresa. Ayudan a reducir riesgos, proteger información crítica y garantizar la continuidad del negocio.</p>
+          <p><strong>KPIs de Transformación Digital:</strong> Miden el avance y efectividad de la digitalización de procesos, herramientas y cultura tecnológica de la empresa. Ayudan a asegurar que la transformación genere valor real y competitividad.</p>
+          <p><strong>KPIs de Gestión de Proyectos:</strong> Evalúan el desempeño de los proyectos en terminos de cumplimiento de objetivos, tiempo, presupuesto, calidad y satisfacción de los interesados. Ayudan a identificar riesgos, optimizar recursos, mejorar la planificación y asegurar que los proyectos aporten valor estratégico.</p>
+          <p><strong>KPIs de productividad:</strong> Miden la eficiencia en el uso de recursos humanos, materiales y tecnológicos para generar resultados. Evalúan el rendimiento de equipos, procesos y áreas de la empresa, permitiendo identificar oportunidades de mejora, aumentar la eficiencia operativa y maximizar el valor generado por la organización.</p>       
+        </div>
+      </details>
+    </div>
+  </details>
+
+  <!-- Sección de Contactanos con formulario -->
+  <details>
+    <summary>Contáctanos</summary>
+    <div class="form-container">
+
+      <div class="imagen-wrapper">
+        <img src="transformacion.jpg" alt="Contáctanos" class="imagen-centrada-borde"style="border-radius: 20px;" width="300px" height="150px">
+      </div>
+
+      <h3>Ingresa tus datos</h3>
+      <form id="formContacto">
+        <label>Nombres</label>
+        <input placeholder="Ingresa tus nombres" type="text" name="nombres" required>
+        <label>Apellidos</label>
+        <input placeholder="Ingresa tus apellidos">
+        <label>Correo electrónico</label>
+        <input placeholder="Ingresa tu Email" type="email">
+        <label>Tipo de documento</label>
+        <input placeholder="Ingresa el tipo de DI" type="text" name="tipo_documento" required>
+        <label>Número de documento</label>
+        <input placeholder="Ingresa el número de DI">
+        <label>Edad</label>
+        <input placeholder="Ingresa tu edad">
+        <label>Código postal</label>
+        <input placeholder="Ingresa el código postal" type="text" name="codigo_postal" required>
+        <label>Número de contacto</label>
+        <input placeholder="Ingresa el No. de teléfono" type="tel" name="numero_contacto" required>
+        <label>Fecha de nacimiento</label>
+        <input placeholder="Ingresa tu fecha de nacimiento" type="date" name="fecha_nacimiento" required>
+        <label>Mensaje:</label><textarea placeholder="Escribe tu mensaje"></textarea><br>
+        <h4>¿Cómo te gustaría que nos comuniquemos contigo?</h4>
+        <input type="radio" name="comunicacion" id="com_email" value="email"><label for="com_email"> Correo electrónico</label><br>
+        <input type="radio" name="comunicacion" id="com_whatsapp" value="whatsapp"><label for="com_whatsapp"> WhatsApp</label><br>
+        <input type="radio" name="comunicacion" id="com_llamada" value="llamada"><label for="com_llamada"> Llamada</label><br>
+        <input type="radio" name="comunicacion" id="com_telegram" value="telegram"><label for="com_telegram"> Telegram</label><br>
+        <h5><label><input type="checkbox" required> Acepta el tratamiento de datos</label></h5>
+        <input type="submit" value="Enviar" class="btn-primario">
+      </form>
+    </div>
+  </details>
+  <!-- Sección Preguntas Frecuentes -->
+  <details>
+    <summary>Preguntas Frecuentes</summary>
+    <div class="faq-section">
+      <div class="imagen-wrapper">
+        <img src="metrica.jpg" alt="Métricas Clave De Desempeño" class="imagen-centrada-borde">
+      </div>
+      <h4>💎 ¿Qué es el simulador empresarial?</h4>
+      <p>Es una herramienta digital que permite a las empresas analizar su desempeño mediante indicadores clave de gestión. Facilita la toma de decisiones basadas en datos reales o proyectados.</p>
+
+      <h4>💎 ¿A quién está dirigido este simulador?</h4>
+      <p>A las MIPYMES que deseen evaluar áreas como finanzas, productividad, talento humano y operaciones.</p>
+
+      <h4>💎 ¿Debo tener conocimientos técnicos para usarlo?</h4>
+      <p>No. El simulador está diseñado para ser intuitivo y fácil de usar en distintas áreas estratégicas de la empresa, ayudando a identificar fortalezas, oportunidades de mejora y riesgos operativos. Solo necesitas ingresar los datos que se te solicitan, y el sistema calculará automáticamente los resultados.</p>
+
+      <h4>💎 ¿Puedo usar datos reales de mi empresa?</h4>
+      <p>Sí. Puedes ingresar datos reales o proyectados. Toda la información que ingreses será confidencial y no se almacena si no lo autorizas.</p>
+
+      <h4>💎 ¿Puedo descargar los resultados?</h4>
+      <p>Sí. Al finalizar la simulación, puedes descargar un reporte con los indicadores generados y las recomendaciones correspondientes (en formato PDF).</p>
+
+      <h4>💎 ¿Puedo hacer varias simulaciones?</h4>
+      <p>Claro. Puedes hacer tantas simulaciones como desees, ya sea para comparar escenarios o para actualizar tus resultados según nuevos datos.</p>
+
+      <h4>💎 ¿Puedo recibir asesoría personalizada?</h4>
+      <p>Sí. Puedes contactarnos a través del formulario de contacto o por WhatsApp para agendar una asesoría adaptada a las necesidades de tu empresa.</p>
+
+      <h4>💎 ¿Qué tipo de indicadores calcula?</h4>
+      <p>Los KPIs “Key Performance Indicators” (por sus siglas en inglés) se pueden utilizar en diferentes áreas estratégicas de la empresa ayudando a identificar fortalezas, oportunidades de mejora y riesgos operativos. Los principales son:</p>
+      <ul>
+        <p><strong>Financieros:</strong> Rentabilidad, liquidez, endeudamiento, margen operativo, capital de trabajo y retorno sobre la inversión (ROI).</p>
+        <p><strong>Productividad:</strong> Eficiencia operativa, tiempos de producción.</p>
+        <p><strong>Talento humano:</strong> Satisfacción del empleado, rotación de personal, índice de ausentismo, clima organizacional, capacitación por empleado.</p>
+        <p><strong>Operaciones:</strong> Costos operativos, calidad del servicio, tiempos de ciclo, nivel de eficiencia, capacidad utilizada vs. capacidad instalada.</p>
+        <p><strong>Marketing:</strong> Tasa de conversión, alcance e impresiones, engagement, tasa de clics (CTR), costo por adquisición de cliente (CAC), retorno sobre la inversión publicitaria (ROAS).</p>
+        <p><strong>Ventas:</strong> Volumen de ventas, tasa de cierre, crecimiento de ventas, ticket promedio, tasa de retención de clientes, clientes nuevos vs. clientes recurrentes.</p>
+        <p><strong>Logística e inventarios:</strong> Costos de envío, tiempos de entrega, tasa de cumplimiento de pedidos, inventario disponible vs. inventario requerido.</p>
+        <p><strong>Atención al cliente:</strong> Tiempo de respuesta, tasa de resolución en el primer contacto, satisfacción del cliente (NPS), número de quejas o reclamos, índice de fidelización.</p>
+        <p><strong>Innovación:</strong> Número de nuevos productos/servicios lanzados, porcentaje de ingresos por innovación, tiempo de desarrollo de nuevos productos, inversión en I+D.</p>
+        <p><strong>Sostenibilidad:</strong> Huella de carbono, consumo de energía, porcentaje de residuos reciclados, proyectos ambientales implementados, cumplimiento de normativas ambientales.</p>
+        <p><strong>Ciberseguridad:</strong> Incidentes reportados, backups realizados, cumplimiento normativo, protección de accesos y datos.</p>
+        <p><strong>Transformación digital:</strong> Porcentaje de procesos digitalizados, adopción de nuevas tecnologías, capacitación en herramientas digitales, eficiencia en la gestión de datos.</p>
+        <p><strong>Gestión de proyectos:</strong> Proyectos entregados a tiempo, avance frente al cronograma, cumplimiento del presupuesto, índice de éxito de proyectos.</p>
+        <p><strong>Producción:</strong> Unidades producidas vs. unidades planificadas, tiempo de inactividad o mantenimiento, porcentaje de desperdicio, costo total de producción, cumplimiento de metas productivas.</p>
+        <p><strong>Calidad:</strong> Porcentaje de defectos, índice de retrabajo, satisfacción con el producto, cumplimiento de estándares.</p>
+      </ul>
+    </div>
+  </details>
+
+  <!-- ====== BOTÓN y MODAL PARA PROYECCIONES ESTRATÉGICAS 360 ====== -->
+  <div style="position:fixed;bottom:22px;right:22px;z-index:150">
+    <button id="openProyecciones" class="btn-primario" title="Proyecciones Estratégicas 360">Proyecciones Estratégicas 360</button>
+  </div>
+
+  <!-- Modal -->
+<div id="modalProyecciones" class="modal" aria-hidden="true">
+  <div class="modal-overlay" id="overlay"></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button id="closeModal" class="modal-close" aria-label="Cerrar">&times;</button>
+
+    <!-- Bienvenida -->
+<div id="bienvenidaProyecciones" class="modal-section">
+  <h2 id="modalTitle" class="modal-title">Proyecciones Estratégicas 360</h2>
+  <p class="modal-subtitle">
+    Fortalece tus decisiones empresariales en un entorno interactivo de análisis inteligente que combina IA y modelado estratégico para transformar indicadores en conocimiento accionable..
+  </p>
+  <div class="modal-img">
+    <img src="metricas.jpg" alt="Proyecciones" class="imagen-centrada-borde" 
+         style="border-radius: 20px;" width="400px" height="200px">
+  </div>
+  <div class="modal-actions">
+    <button id="btnIrIndicadores" class="btn-primario">Ver Indicadores</button>
+    <button id="btnIrEstados" class="btn-primario">Ver Estados Financieros</button>
+  </div>
+</div>
+    <!-- Script solo para controlar los botones básicos -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('modalProyecciones');
+    const bienvenida = document.getElementById('bienvenidaProyecciones');
+    const btnIndicadores = document.getElementById('btnIrIndicadores');
+    const closeModalBtn = document.getElementById('closeModal');
+    const overlay = document.getElementById('overlay');
+    const btnEstados = document.getElementById('btnIrEstados');
+
+    // abrir modal
+    document.getElementById('openProyecciones').addEventListener('click', () => {
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      bienvenida.style.display = 'block';
+    });
+
+    // cerrar modal
+    function closeModal() {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+    closeModalBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+
+    // botón "Ver Indicadores" (abre la página de indicadores)
+    btnIndicadores.addEventListener('click', function () {
+      window.location.href = 'indexindicadores.html';
+    });
+
+    // botón "Ver Estados Financieros" (abre la otra página)
+    btnEstados.addEventListener('click', function () {
+      window.location.href = 'indexestadosfinancieros.html';
+    });
+  });
+</script>
+  </div>
+</div>
+</body>
+</html>

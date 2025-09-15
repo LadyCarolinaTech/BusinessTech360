@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BusinessTech 360</title>
+  <style>
+    :root{
+      --azul:#0b3d67;            /* Título y acentos */
+      --azul-suave:#0d4b85;
+      --azul-ui:#0e4a7a;
+      --borde:#e7eef6;
+      --bg:#ffffff;              /* Fondo blanco como pediste */
+      --text:#172b4d;
+      --muted:#6b778c;
+      --card:#f5f8fc;
+      --card-hover:#e8f0fb;
+      --accent:#0b3d67;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    /* ===== Header ===== */
+    header{
+      background: #fff;
+      border-bottom: 1px solid var(--borde);
+      padding: 22px 24px;
+      position: sticky; top:0; z-index:5;
+    }
+    header h1 {
+  color: #003366;
+  margin: 0;
+  font-size: 26px;   /* tamaño más pequeño */
+  font-weight: bold;
+  text-align: center; /* centrado */
+}
+
+
+    /* ===== App layout (3 columnas) ===== */
+    #app{
+      height: calc(100vh - 86px);
+      display: grid;
+      grid-template-columns: 280px 420px 1fr;
+      gap: 18px;
+      padding: 18px 24px;
+      background: var(--bg);
+    }
+    .col{
+      background:#fff;
+      border:1px solid var(--borde);
+      border-radius: var(--radius);
+      padding: 14px;
+      overflow: hidden;
+      display:flex; flex-direction:column;
+      min-height:0; /* para scroll correcto */
+    }
+    .col h2{
+      margin: 2px 4px 12px 4px;
+      font-size: 20px; color: var(--azul);
+    }
+
+    /* ===== Listas con scroll ===== */
+    .scroll{
+      overflow:auto; flex:1; padding-right:4px;
+    }
+    .list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+    .list li, .card{
+      background: var(--card);
+      border:1px solid var(--borde);
+      border-radius: 12px;
+      padding: 12px 12px;
+      cursor:pointer;
+      transition: background .15s ease, box-shadow .15s ease, transform .05s ease;
+    }
+    .list li:hover, .card:hover{
+      background: var(--card-hover);
+    }
+    .list li.active{
+      background: var(--azul);
+      color: #fff;
+      border-color: var(--azul);
+      box-shadow: 0 2px 10px rgba(11,61,103,.18);
+    }
+    .list .name{
+      font-weight: 700;
+      display:block;
+      margin-bottom:2px;
+    }
+    .list .desc{ color: var(--muted); font-size: 12px; }
+    .diamond{ margin-right:8px }
+
+    /* Indicadores (columna central) */
+    .ind-card{
+      display:flex; gap:10px; align-items:flex-start;
+    }
+    .ind-card .meta{display:flex; flex-direction:column}
+    .ind-card .title{font-weight:800; color:var(--text)}
+    .ind-card .formula{font-size:12px; color:var(--muted)}
+
+    /* ===== Formulario (columna derecha) ===== */
+    .panel h3{
+      margin: 2px 2px 6px; font-size:22px; color:var(--azul);
+      display:flex; align-items:center; gap:8px;
+    }
+    .panel .formula{
+      margin-bottom:12px; color:var(--muted); font-size:14px;
+    }
+    .field{ margin-bottom:12px; }
+    .field label{ display:block; font-size:13px; color:var(--text); margin-bottom:6px; font-weight:700 }
+    .field input{
+      width:100%; padding:10px 12px; border-radius:10px;
+      border:1px solid var(--borde); background:#fff; color:var(--text);
+      font-size:14px;
+    }
+    .actions{ display:flex; gap:10px; padding-top:2px; }
+    .btn{
+      border:0; border-radius:12px; padding:10px 18px;
+      background: var(--azul); color:#fff; font-weight:700; cursor:pointer;
+      box-shadow: 0 1px 6px rgba(11,61,103,.15);
+    }
+    .btn.secondary{ background:#163a5f14; color:var(--azul); border:1px solid var(--borde) }
+    .btn:hover{ filter:brightness(1.05) }
+
+    .result{
+      margin-top:14px; background: var(--card); border:1px solid var(--borde);
+      border-radius:12px; padding:12px;
+    }
+    .result .value{ font-size:16px; font-weight:800; color:var(--azul-ui) }
+    .result .ai{ margin-top:8px; color:#243b53 }
+    .small{ font-size:12px; color:var(--muted) }
+    .badge{ background:#eaf2ff; color:var(--azul); border:1px solid var(--borde);
+      padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; }
+
+    /* Scrollbars suaves */
+    .scroll::-webkit-scrollbar{ width:10px }
+    .scroll::-webkit-scrollbar-thumb{ background:#d7e2f2; border-radius:10px }
+    .scroll::-webkit-scrollbar-track{ background:transparent }
+    @media (max-width: 1100px){
+      #app{ grid-template-columns: 1fr; height:auto }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BusinessTech 360</h1>
+  </header>
+
+  <!-- =================== APP (3 columnas) =================== -->
+  <main id="app">
+    <!-- Columna 1: Categorías -->
+    <section class="col">
+      <h2>Categorías</h2>
+      <div class="scroll">
+        <ul id="listaCategorias" class="list"></ul>
+      </div>
+    </section>
+
+    <!-- Columna 2: Indicadores de la categoría -->
+    <section class="col">
+      <h2 id="tituloCategoria">Indicadores</h2>
+      <div class="scroll" id="listaIndicadores"></div>
+    </section>
+
+    <!-- Columna 3: Formulario de cálculo -->
+    <section class="col panel" id="panelCalculo">
+      <h2>Calcular</h2>
+      <div class="small">Seleccione un indicador para ver su fórmula y realizar el cálculo.</div>
+    </section>
+  </main>
+
+  <!-- =================== DATA embebida (todas las categorías e indicadores) =================== -->
+  <script type="application/json" id="indicadores-data">
+  {
+    "tituloModulo": "BusinessTech 360",
+    "categorias": [
+      {
+        "id": "finanzas",
+        "nombre": "Finanzas",
+        "indicadores": [
+          {"id":"rentabilidad_roa","nombre":"ROA (Rentabilidad sobre activos)","formula":"Utilidad Neta / Total Activo","campos":[{"k":"utilidad_neta","label":"Utilidad Neta"},{"k":"total_activo","label":"Total Activo"}],"interpretacion":"ROA alto indica buen aprovechamiento de los activos."},
+          {"id":"margen_operativo","nombre":"Margen Operativo","formula":"Utilidad Operativa / Ventas Netas","campos":[{"k":"utilidad_operativa","label":"Utilidad Operativa"},{"k":"ventas_netas","label":"Ventas Netas"}],"interpretacion":"Margen operativo saludable sugiere control de costos."},
+          {"id":"liquidez_razon_corriente","nombre":"Razón Corriente (Liquidez)","formula":"Activo Corriente / Pasivo Corriente","campos":[{"k":"activo_corriente","label":"Activo Corriente"},{"k":"pasivo_corriente","label":"Pasivo Corriente"}],"interpretacion":">1 indica capacidad de cubrir obligaciones de corto plazo."},
+          {"id":"endeudamiento_ratio","nombre":"Razón de Endeudamiento","formula":"Pasivo Total / Activo Total","campos":[{"k":"pasivo_total","label":"Pasivo Total"},{"k":"activo_total","label":"Activo Total"}],"interpretacion":"Bajo endeudamiento reduce riesgo financiero."},
+          {"id":"roi","nombre":"Retorno sobre la Inversión (ROI)","formula":"Ganancia Neta / Inversión Inicial","campos":[{"k":"ganancia_neta","label":"Ganancia Neta"},{"k":"inversion_inicial","label":"Inversión Inicial"}],"interpretacion":"ROI positivo señala inversión rentable."},
+          {"id":"capital_trabajo_neto","nombre":"Capital de Trabajo Neto","formula":"Activo Corriente - Pasivo Corriente","campos":[{"k":"activo_corriente","label":"Activo Corriente"},{"k":"pasivo_corriente","label":"Pasivo Corriente"}],"interpretacion":"Capital de trabajo positivo favorece operaciones."}
+        ]
+      },
+      {
+        "id":"productividad","nombre":"Productividad","indicadores":[
+          {"id":"eficiencia_operativa","nombre":"Eficiencia Operativa","formula":"Output útil / Recursos usados","campos":[{"k":"output_util","label":"Output útil (unidades)"},{"k":"recursos_usados","label":"Recursos usados (horas/costo)"}],"interpretacion":"Mayor eficiencia = mejor uso de recursos."},
+          {"id":"tiempos_produccion","nombre":"Tiempos de Producción","formula":"Tiempo total de producción / Unidades producidas","campos":[{"k":"tiempo_total","label":"Tiempo total de producción (horas)"},{"k":"unidades_producidas","label":"Unidades producidas"}],"interpretacion":"Menores tiempos por unidad indican procesos ágiles."}
+        ]
+      },
+      {
+        "id":"talento_humano","nombre":"Talento humano","indicadores":[
+          {"id":"satisfaccion_empleado","nombre":"Satisfacción del empleado","formula":"Suma de puntajes / Número de encuestados","campos":[{"k":"puntaje_total","label":"Suma de puntajes de la encuesta"},{"k":"num_encuestados","label":"Número de encuestados"}],"interpretacion":"Mayor puntaje indica mejor clima laboral."},
+          {"id":"rotacion_personal","nombre":"Rotación de personal","formula":"(Personas que salieron / Promedio de empleados) * 100","campos":[{"k":"personas_salieron","label":"Personas que salieron en el periodo"},{"k":"promedio_empleados","label":"Promedio de empleados en el periodo"}],"interpretacion":"Rotación alta puede indicar problemas de retención."},
+          {"id":"indice_ausentismo","nombre":"Índice de Ausentismo","formula":"(Días perdidos / (N° empleados * Días laborales)) * 100","campos":[{"k":"dias_perdidos","label":"Días perdidos por ausentismo"},{"k":"num_empleados","label":"Número de empleados"},{"k":"dias_laborales","label":"Días laborales en el periodo"}],"interpretacion":"Índice elevado afecta productividad."},
+          {"id":"capacitacion_por_empleado","nombre":"Capacitación por empleado (hrs)","formula":"Total horas formación / Número de empleados","campos":[{"k":"horas_formacion","label":"Total horas de formación"},{"k":"num_empleados","label":"Número de empleados"}],"interpretacion":"Más capacitación puede mejorar innovación y retención."}
+        ]
+      },
+      {
+        "id":"operaciones","nombre":"Operaciones","indicadores":[
+          {"id":"costos_operativos","nombre":"Costos Operativos totales","formula":"Suma de costos operativos","campos":[{"k":"costos_operativos","label":"Costos operativos totales"}],"interpretacion":"Control de costos mejora márgenes."},
+          {"id":"tiempos_ciclo","nombre":"Tiempo de ciclo","formula":"Tiempo total proceso / Número de ciclos","campos":[{"k":"tiempo_total","label":"Tiempo total proceso (horas)"},{"k":"num_ciclos","label":"Número de ciclos"}],"interpretacion":"Menor tiempo de ciclo = eficiencia."},
+          {"id":"nivel_eficiencia_operaciones","nombre":"Nivel de eficiencia (%)","formula":"(Producción real / Producción teórica) * 100","campos":[{"k":"produccion_real","label":"Producción real"},{"k":"produccion_teorica","label":"Producción teórica"}],"interpretacion":"Cerca de 100% indica operación óptima."}
+        ]
+      },
+      {
+        "id":"marketing","nombre":"Marketing","indicadores":[
+          {"id":"tasa_conversion","nombre":"Tasa de conversión","formula":"(Conversiones / Visitantes) * 100","campos":[{"k":"conversiones","label":"Conversiones"},{"k":"visitantes","label":"Visitantes"}],"interpretacion":"Eficiencia para convertir tráfico."},
+          {"id":"cac","nombre":"Costo por Adquisición (CAC)","formula":"Gasto en marketing / Nuevos clientes","campos":[{"k":"gasto_marketing","label":"Gasto en marketing"},{"k":"nuevos_clientes","label":"Nuevos clientes"}],"interpretacion":"CAC bajo es favorable (comparar con LTV)."},
+          {"id":"roas","nombre":"ROAS","formula":"Ingresos por campaña / Gasto en campaña","campos":[{"k":"ingresos_campana","label":"Ingresos por campaña"},{"k":"gasto_campana","label":"Gasto en campaña"}],"interpretacion":"ROAS > 1 indica recuperación de inversión publicitaria."},
+          {"id":"ctr","nombre":"CTR (Tasa de clics)","formula":"(Clics / Impresiones) * 100","campos":[{"k":"clics","label":"Clics"},{"k":"impresiones","label":"Impresiones"}],"interpretacion":"CTR alto ≈ mayor atractivo del anuncio."}
+        ]
+      },
+      {
+        "id":"ventas","nombre":"Ventas","indicadores":[
+          {"id":"volumen_ventas","nombre":"Volumen de ventas","formula":"Total unidades vendidas","campos":[{"k":"unidades_vendidas","label":"Unidades vendidas"}],"interpretacion":"Mide escala de ventas."},
+          {"id":"tasa_cierre","nombre":"Tasa de cierre","formula":"(Oportunidades cerradas / Oportunidades totales) * 100","campos":[{"k":"oportunidades_cerradas","label":"Oportunidades cerradas"},{"k":"oportunidades_totales","label":"Oportunidades totales"}],"interpretacion":"Eficacia del equipo comercial."},
+          {"id":"crecimiento_ventas","nombre":"Crecimiento de ventas","formula":"(Ventas actuales - Ventas anteriores) / Ventas anteriores","campos":[{"k":"ventas_actuales","label":"Ventas actuales"},{"k":"ventas_anteriores","label":"Ventas anteriores"}],"interpretacion":"Crecimiento positivo es favorable."},
+          {"id":"ticket_promedio","nombre":"Ticket promedio","formula":"Ingresos / Número de ventas","campos":[{"k":"ingresos","label":"Ingresos"},{"k":"num_ventas","label":"Número de ventas"}],"interpretacion":"Valor promedio por venta."},
+          {"id":"retencion_clientes","nombre":"Tasa de retención","formula":"(Clientes recurrentes / Clientes totales) * 100","campos":[{"k":"clientes_recurrentes","label":"Clientes recurrentes"},{"k":"clientes_totales","label":"Clientes totales"}],"interpretacion":"Alta retención = fidelidad."}
+        ]
+      },
+      {
+        "id":"logistica","nombre":"Logística e inventarios","indicadores":[
+          {"id":"costos_envio","nombre":"Costos de envío","formula":"Suma de costos de envío","campos":[{"k":"costos_envio","label":"Costos de envío totales"}],"interpretacion":"Optimizar logística mejora margen."},
+          {"id":"tiempos_entrega","nombre":"Tiempos de entrega promedio","formula":"Suma tiempos de entrega / Pedidos","campos":[{"k":"suma_tiempos","label":"Suma de tiempos de entrega"},{"k":"num_pedidos","label":"Número de pedidos"}],"interpretacion":"Menor tiempo mejora satisfacción."},
+          {"id":"tasa_cumplimiento","nombre":"Tasa de cumplimiento de pedidos","formula":"(Pedidos entregados a tiempo / Pedidos totales) * 100","campos":[{"k":"pedidos_on_time","label":"Pedidos entregados a tiempo"},{"k":"pedidos_totales","label":"Pedidos totales"}],"interpretacion":"Alta tasa indica logística confiable."},
+          {"id":"inventario_disponible_vs_requerido","nombre":"Inventario disponible vs requerido","formula":"Inventario disponible / Inventario requerido","campos":[{"k":"inventario_disponible","label":"Inventario disponible"},{"k":"inventario_requerido","label":"Inventario requerido"}],"interpretacion":"≈1 indica equilibrio; <1 riesgo de faltantes."}
+        ]
+      },
+      {
+        "id":"atencion_cliente","nombre":"Atención al cliente","indicadores":[
+          {"id":"tiempo_respuesta","nombre":"Tiempo de respuesta promedio (hrs)","formula":"Suma tiempos / Tickets respondidos","campos":[{"k":"suma_tiempos","label":"Suma tiempos de respuesta (hrs)"},{"k":"tickets_respondidos","label":"Tickets respondidos"}],"interpretacion":"Menor tiempo mejora satisfacción."},
+          {"id":"tasa_resolucion_primer_contacto","nombre":"Tasa de resolución en primer contacto (FCR)","formula":"(Tickets resueltos primer contacto / Tickets totales) * 100","campos":[{"k":"resueltos_1er","label":"Tickets resueltos en primer contacto"},{"k":"tickets_totales","label":"Tickets totales"}],"interpretacion":"FCR alta indica soporte eficaz."},
+          {"id":"nps","nombre":"Satisfacción del cliente (NPS)","formula":"% Promotores - % Detractores","campos":[{"k":"promotores","label":"% Promotores"},{"k":"detractores","label":"% Detractores"}],"interpretacion":"NPS positivo indica lealtad."}
+        ]
+      },
+      {
+        "id":"innovacion","nombre":"Innovación","indicadores":[
+          {"id":"nuevos_productos","nombre":"Nº de nuevos productos/servicios lanzados","formula":"Conteo simple","campos":[{"k":"nuevos_lanzamientos","label":"Nuevos lanzamientos en periodo"}],"interpretacion":"Más lanzamientos ≈ dinamismo e innovación."},
+          {"id":"ingresos_por_innovacion","nombre":"% ingresos por innovación","formula":"(Ingresos por nuevos productos / Ingresos totales) * 100","campos":[{"k":"ingresos_innovacion","label":"Ingresos por innovación"},{"k":"ingresos_totales","label":"Ingresos totales"}],"interpretacion":"Mayor % indica impacto de la innovación."},
+          {"id":"tiempo_desarrollo","nombre":"Tiempo desarrollo nuevos productos (meses)","formula":"Meses totales / Número de proyectos","campos":[{"k":"meses_totales","label":"Meses totales invertidos"},{"k":"num_proyectos","label":"Número de proyectos"}],"interpretacion":"Menor tiempo acelera la ventaja competitiva."}
+        ]
+      },
+      {
+        "id":"sostenibilidad","nombre":"Sostenibilidad","indicadores":[
+          {"id":"huella_carbono","nombre":"Huella de carbono (ton CO2)","formula":"Cálculo total de emisiones","campos":[{"k":"emisiones_total","label":"Emisiones totales (ton CO2)"}],"interpretacion":"Reducir la huella mejora cumplimiento y reputación."},
+          {"id":"consumo_energia","nombre":"Consumo de energía (kWh)","formula":"Suma consumo energía","campos":[{"k":"consumo_total","label":"Consumo total (kWh)"}],"interpretacion":"Optimizar consumo reduce costos y emisiones."},
+          {"id":"porcentaje_residuos_reciclados","nombre":"% residuos reciclados","formula":"(Residuos reciclados / Residuos totales) * 100","campos":[{"k":"residuos_reciclados","label":"Residuos reciclados"},{"k":"residuos_totales","label":"Residuos totales"}],"interpretacion":"Mayor % refleja gestión responsable."}
+        ]
+      },
+      {
+        "id":"ciberseguridad","nombre":"Ciberseguridad","indicadores":[
+          {"id":"incidentes_reportados","nombre":"Incidentes reportados","formula":"Conteo de incidentes","campos":[{"k":"incidentes","label":"Incidentes en el periodo"}],"interpretacion":"Monitorear tendencia y respuesta."},
+          {"id":"backups_realizados","nombre":"Backups realizados (%)","formula":"(Backups exitosos / Backups programados) * 100","campos":[{"k":"backups_exitosos","label":"Backups exitosos"},{"k":"backups_programados","label":"Backups programados"}],"interpretacion":"Cercanía a 100% asegura recuperación."},
+          {"id":"cumplimiento_normativo","nombre":"Cumplimiento normativo (%)","formula":"(Requisitos cumplidos / Requisitos totales) * 100","campos":[{"k":"req_cumplidos","label":"Requisitos cumplidos"},{"k":"req_totales","label":"Requisitos totales"}],"interpretacion":"Mayor % reduce riesgos legales."}
+        ]
+      },
+      {
+        "id":"transformacion_digital","nombre":"Transformación digital","indicadores":[
+          {"id":"porcentaje_procesos_digitalizados","nombre":"% procesos digitalizados","formula":"(Procesos digitalizados / Procesos totales) * 100","campos":[{"k":"proc_digitalizados","label":"Procesos digitalizados"},{"k":"proc_totales","label":"Procesos totales"}],"interpretacion":"Mayor % indica madurez digital."},
+          {"id":"adopcion_tecnologias","nombre":"Adopción de nuevas tecnologías (%)","formula":"(Usuarios activos / Usuarios objetivo) * 100","campos":[{"k":"usuarios_activos","label":"Usuarios activos"},{"k":"usuarios_objetivo","label":"Usuarios objetivo"}],"interpretacion":"Elevada adopción facilita eficiencias."}
+        ]
+      },
+      {
+        "id":"gestion_proyectos","nombre":"Gestión de proyectos","indicadores":[
+          {"id":"proyectos_entregados_tiempo","nombre":"Proyectos entregados a tiempo (%)","formula":"(Proyectos a tiempo / Proyectos totales) * 100","campos":[{"k":"proyectos_tiempo","label":"Proyectos entregados a tiempo"},{"k":"proyectos_totales","label":"Proyectos totales"}],"interpretacion":"Alto % indica cumplimiento."},
+          {"id":"avance_cronograma","nombre":"Avance frente al cronograma (%)","formula":"(Avance real / Avance planificado) * 100","campos":[{"k":"avance_real","label":"Avance real"},{"k":"avance_planificado","label":"Avance planificado"}],"interpretacion":"Comparar para detectar retrasos."}
+        ]
+      },
+      {
+        "id":"produccion","nombre":"Producción","indicadores":[
+          {"id":"unidades_vs_plan","nombre":"Unidades producidas vs plan","formula":"Unidades producidas / Unidades planificadas","campos":[{"k":"unidades_producidas","label":"Unidades producidas"},{"k":"unidades_planificadas","label":"Unidades planificadas"}],"interpretacion":"≈1 indica cumplimiento del plan."},
+          {"id":"tiempo_inactividad","nombre":"Tiempo de inactividad (hrs)","formula":"Suma horas de inactividad","campos":[{"k":"hrs_inactividad","label":"Horas de inactividad"}],"interpretacion":"Menor inactividad mejora capacidad."},
+          {"id":"porcentaje_desperdicio","nombre":"% desperdicio","formula":"(Material desperdiciado / Material usado) * 100","campos":[{"k":"material_desperdiciado","label":"Material desperdiciado"},{"k":"material_usado","label":"Material usado"}],"interpretacion":"Reducir desperdicio mejora costos."}
+        ]
+      },
+      {
+        "id":"calidad","nombre":"Calidad","indicadores":[
+          {"id":"porcentaje_defectos","nombre":"% defectos","formula":"(Unidades defectuosas / Unidades inspeccionadas) * 100","campos":[{"k":"defectuosas","label":"Unidades defectuosas"},{"k":"inspeccionadas","label":"Unidades inspeccionadas"}],"interpretacion":"Menor % = mayor calidad."},
+          {"id":"indice_retrabajo","nombre":"Índice de retrabajo (%)","formula":"(Unidades retrabajadas / Unidades producidas) * 100","campos":[{"k":"retrabajadas","label":"Unidades retrabajadas"},{"k":"producidas","label":"Unidades producidas"}],"interpretacion":"Retrabajo alto incrementa costos y tiempos."}
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- =================== LÓGICA =================== -->
+  <script>
+  (function(){
+    // Parse JSON datos
+    const DATA = JSON.parse(document.getElementById('indicadores-data').textContent);
+
+    // Elementos UI
+    const listaCategorias = document.getElementById('listaCategorias');
+    const listaIndicadores = document.getElementById('listaIndicadores');
+    const tituloCategoria = document.getElementById('tituloCategoria');
+    const panelCalculo = document.getElementById('panelCalculo');
+
+    // Cargar categorías
+    DATA.categorias.forEach((cat, idx) => {
+      const li = document.createElement('li');
+      li.innerHTML = '<span class="name">'+cat.nombre+'</span>';
+      li.dataset.cat = cat.id;
+      if(idx===0) li.classList.add('active');
+      li.addEventListener('click', () => selectCategory(cat.id));
+      listaCategorias.appendChild(li);
+    });
+
+    // Seleccionar categoría por defecto
+    let currentCategory = DATA.categorias[0].id;
+    selectCategory(currentCategory);
+
+    // Selección de categoría
+    function selectCategory(catId){
+      currentCategory = catId;
+      // active state UI
+      [...listaCategorias.children].forEach(li => li.classList.toggle('active', li.dataset.cat===catId));
+      // Título y tarjetas de indicadores
+      const cat = DATA.categorias.find(c => c.id===catId);
+      tituloCategoria.textContent = cat.nombre;
+      listaIndicadores.innerHTML = '';
+      const grid = document.createElement('div'); grid.className='list';
+      cat.indicadores.forEach(ind => {
+        const card = document.createElement('div');
+        card.className = 'card ind-card';
+        card.innerHTML = '<div class="diamond">💎</div><div class="meta"><span class="title">'+ind.nombre+'</span><span class="formula">'+ind.formula+'</span></div>';
+        card.addEventListener('click', ()=> openIndicator(ind));
+        grid.appendChild(card);
+      });
+      listaIndicadores.appendChild(grid);
+      // limpiar panel cálculo
+      panelCalculo.innerHTML = '<h2>Calcular</h2><div class="small">Seleccione un indicador para ver su fórmula y realizar el cálculo.</div>';
+    }
+
+    function openIndicator(ind){
+      panelCalculo.innerHTML = '';
+      const h = document.createElement('h3'); h.innerHTML = '💎 '+ind.nombre;
+      const f = document.createElement('div'); f.className='formula'; f.textContent = 'Fórmula: ' + ind.formula;
+      panelCalculo.appendChild(h); panelCalculo.appendChild(f);
+
+      // construir campos
+      ind.campos.forEach(c=>{
+        const wrap = document.createElement('div'); wrap.className='field';
+        const lab = document.createElement('label'); lab.textContent = c.label;
+        const inp = document.createElement('input'); inp.type='number'; inp.step='any'; inp.placeholder='Ingrese valor'; inp.id = 'fld_'+ind.id+'_'+c.k;
+        wrap.appendChild(lab); wrap.appendChild(inp);
+        panelCalculo.appendChild(wrap);
+      });
+
+      const actions = document.createElement('div'); actions.className='actions';
+      const calc = document.createElement('button'); calc.className='btn'; calc.textContent='Calcular';
+      const clear = document.createElement('button'); clear.className='btn secondary'; clear.textContent='Borrar';
+      actions.appendChild(calc); actions.appendChild(clear);
+      panelCalculo.appendChild(actions);
+
+      const resultBox = document.createElement('div'); resultBox.className='result'; resultBox.style.display='none';
+      resultBox.innerHTML = '<div class="value"><strong>Resultado:</strong> <span id="valRes"></span></div><div class="ai" id="aiRes"></div><div class="small" style="margin-top:8px">Fórmula: '+ind.formula+'</div>';
+      panelCalculo.appendChild(resultBox);
+
+      calc.addEventListener('click', ()=>{
+        const vals = {};
+        let miss = false;
+        ind.campos.forEach(c=>{
+          const el = document.getElementById('fld_'+ind.id+'_'+c.k);
+          const v = parseFloat(el.value);
+          if(isNaN(v)){ miss=true; }
+          vals[c.k] = v;
+        });
+        if(miss){ alert('Por favor llene todos los campos.'); return; }
+        const res = computeIndicator(ind.id, vals);
+        document.getElementById('valRes').textContent = formatNumber(res.value) + (res.unit||'');
+        const ai = aiColombia(ind.id, res.value, currentCategory);
+        document.getElementById('aiRes').innerHTML = '<span class="badge">IA</span> '+ (res.interpretation? (res.interpretation+' ') : '') + ai;
+        resultBox.style.display='block';
+      });
+
+      clear.addEventListener('click', ()=>{
+        ind.campos.forEach(c=>{
+          const el = document.getElementById('fld_'+ind.id+'_'+c.k); if(el) el.value='';
+        });
+        resultBox.style.display='none';
+      });
+    }
+
+    // ====== Cálculos por indicador ======
+    function computeIndicator(id, v){
+      switch(id){
+        case 'rentabilidad_roa': { const val = v.utilidad_neta / v.total_activo; return {value: val, unit:'', interpretation: interpretRange(val,'roa')}; }
+        case 'margen_operativo': { const val = v.utilidad_operativa / v.ventas_netas; return {value: val, unit:'', interpretation: interpretRange(val,'margen_operativo')}; }
+        case 'liquidez_razon_corriente': { const val = v.activo_corriente / v.pasivo_corriente; return {value: val, unit:'', interpretation: interpretRange(val,'razon_corriente')}; }
+        case 'endeudamiento_ratio': { const val = v.pasivo_total / v.activo_total; return {value: val, unit:'', interpretation: interpretRange(val,'endeudamiento')}; }
+        case 'roi': { const val = v.ganancia_neta / v.inversion_inicial; return {value: val, unit:'', interpretation: val>0? 'ROI positivo: inversión rentable.' : 'ROI negativo: pérdida en la inversión.'}; }
+        case 'capital_trabajo_neto': { const val = v.activo_corriente - v.pasivo_corriente; return {value: val, unit:'', interpretation: val>0? 'Capital de trabajo positivo.' : 'Capital de trabajo negativo.'}; }
+
+        case 'eficiencia_operativa': { const val = v.output_util / v.recursos_usados; return {value: val, unit:'', interpretation: 'Mayor es mejor (comparar con proceso).'}; }
+        case 'tiempos_produccion': { const val = v.tiempo_total / v.unidades_producidas; return {value: val, unit:' horas/unidad', interpretation: 'Menor tiempo por unidad es mejor.'}; }
+
+        case 'satisfaccion_empleado': { const val = v.puntaje_total / v.num_encuestados; return {value: val, unit:' /100', interpretation: val>=75? 'Alta satisfacción.' : 'Revisar clima organizacional.'}; }
+        case 'rotacion_personal': { const val = (v.personas_salieron / v.promedio_empleados) * 100; return {value: val, unit:' %', interpretation: val>20? 'Rotación alta.' : 'Rotación dentro de rango.'}; }
+        case 'indice_ausentismo': { const val = (v.dias_perdidos / (v.num_empleados * v.dias_laborales)) * 100; return {value: val, unit:' %', interpretation: val>5? 'Ausentismo alto.' : 'Ausentismo bajo/moderado.'}; }
+        case 'capacitacion_por_empleado': { const val = v.horas_formacion / v.num_empleados; return {value: val, unit:' hrs', interpretation: 'Mayor inversión suele ser positiva.'}; }
+
+        case 'costos_operativos': { return {value: v.costos_operativos, unit:'', interpretation:'Suma de costos operativos.'}; }
+        case 'tiempos_ciclo': { const val = v.tiempo_total / v.num_ciclos; return {value: val, unit:' hrs', interpretation:'Menor es mejor.'}; }
+        case 'nivel_eficiencia_operaciones': { const val = (v.produccion_real / v.produccion_teorica) * 100; return {value: val, unit:' %', interpretation: val>=90? 'Eficiencia alta.' : 'Revisar cuellos de botella.'}; }
+
+        case 'tasa_conversion': { const val = (v.conversiones / v.visitantes) * 100; return {value: val, unit:' %', interpretation: 'Compara con benchmarks del canal.'}; }
+        case 'cac': { const val = v.gasto_marketing / v.nuevos_clientes; return {value: val, unit:'', interpretation: 'CAC: menor es mejor; comparar con LTV.'}; }
+        case 'roas': { const val = v.ingresos_campana / v.gasto_campana; return {value: val, unit:'', interpretation: val>1? 'ROAS positivo.' : 'ROAS < 1: pérdida.'}; }
+        case 'ctr': { const val = (v.clics / v.impresiones) * 100; return {value: val, unit:' %', interpretation: 'Mayor CTR indica mejor creatividad/segmentación.'}; }
+
+        case 'volumen_ventas': { return {value: v.unidades_vendidas, unit:' unidades', interpretation:'Volumen total.'}; }
+        case 'tasa_cierre': { const val = (v.oportunidades_cerradas / v.oportunidades_totales) * 100; return {value: val, unit:' %', interpretation:'Efectividad comercial.'}; }
+        case 'crecimiento_ventas': { const val = (v.ventas_actuales - v.ventas_anteriores) / v.ventas_anteriores; return {value: val, unit:'', interpretation: val>0? 'Crecimiento positivo.' : 'Contracción.'}; }
+        case 'ticket_promedio': { const val = v.ingresos / v.num_ventas; return {value: val, unit:'', interpretation:'Ticket promedio por venta.'}; }
+        case 'retencion_clientes': { const val = (v.clientes_recurrentes / v.clientes_totales) * 100; return {value: val, unit:' %', interpretation:'Alta retención es positiva.'}; }
+
+        case 'costos_envio': { return {value: v.costos_envio, unit:'', interpretation:'Costos de envío totales.'}; }
+        case 'tiempos_entrega': { const val = v.suma_tiempos / v.num_pedidos; return {value: val, unit:' días', interpretation:'Menor tiempo mejora satisfacción.'}; }
+        case 'tasa_cumplimiento': { const val = (v.pedidos_on_time / v.pedidos_totales) * 100; return {value: val, unit:' %', interpretation:'Mayor % = logística confiable.'}; }
+        case 'inventario_disponible_vs_requerido': { const val = v.inventario_disponible / v.inventario_requerido; return {value: val, unit:'', interpretation: val>=1? 'Suficiente inventario.' : 'Riesgo de faltantes.'}; }
+
+        case 'tiempo_respuesta': { const val = v.suma_tiempos / v.tickets_respondidos; return {value: val, unit:' hrs', interpretation:'Menor es mejor.'}; }
+        case 'tasa_resolucion_primer_contacto': { const val = (v.resueltos_1er / v.tickets_totales) * 100; return {value: val, unit:' %', interpretation:'FCR alta indica soporte eficaz.'}; }
+        case 'nps': { const val = v.promotores - v.detractores; return {value: val, unit:' pts', interpretation: val>0? 'NPS positivo.' : 'NPS negativo.'}; }
+
+        case 'nuevos_productos': { return {value: v.nuevos_lanzamientos, unit:'', interpretation:'Número de lanzamientos.'}; }
+        case 'ingresos_por_innovacion': { const val = (v.ingresos_innovacion / v.ingresos_totales) * 100; return {value: val, unit:' %', interpretation:'Participación de innovación en ventas.'}; }
+        case 'tiempo_desarrollo': { const val = v.meses_totales / v.num_proyectos; return {value: val, unit:' meses', interpretation:'Tiempo promedio de desarrollo.'}; }
+
+        case 'huella_carbono': { return {value: v.emisiones_total, unit:' ton CO2', interpretation:'Huella de carbono total.'}; }
+        case 'consumo_energia': { return {value: v.consumo_total, unit:' kWh', interpretation:'Consumo energético total.'}; }
+        case 'porcentaje_residuos_reciclados': { const val = (v.residuos_reciclados / v.residuos_totales) * 100; return {value: val, unit:' %', interpretation:'% residuos reciclados.'}; }
+
+        case 'incidentes_reportados': { return {value: v.incidentes, unit:'', interpretation:'Conteo de incidentes.'}; }
+        case 'backups_realizados': { const val = (v.backups_exitosos / v.backups_programados) * 100; return {value: val, unit:' %', interpretation:'Respaldo de información.'}; }
+        case 'cumplimiento_normativo': { const val = (v.req_cumplidos / v.req_totales) * 100; return {value: val, unit:' %', interpretation:'Cumplimiento normativo.'}; }
+
+        case 'porcentaje_procesos_digitalizados': { const val = (v.proc_digitalizados / v.proc_totales) * 100; return {value: val, unit:' %', interpretation:'Digitalización de procesos.'}; }
+        case 'adopcion_tecnologias': { const val = (v.usuarios_activos / v.usuarios_objetivo) * 100; return {value: val, unit:' %', interpretation:'Adopción tecnológica.'}; }
+
+        case 'proyectos_entregados_tiempo': { const val = (v.proyectos_tiempo / v.proyectos_totales) * 100; return {value: val, unit:' %', interpretation:'Entregas a tiempo.'}; }
+        case 'avance_cronograma': { const val = (v.avance_real / v.avance_planificado) * 100; return {value: val, unit:' %', interpretation:'Avance frente al plan.'}; }
+
+        case 'unidades_vs_plan': { const val = v.unidades_producidas / v.unidades_planificadas; return {value: val, unit:'', interpretation:'Cumplimiento de plan de producción.'}; }
+        case 'tiempo_inactividad': { return {value: v.hrs_inactividad, unit:' hrs', interpretation:'Horas de inactividad.'}; }
+        case 'porcentaje_desperdicio': { const val = (v.material_desperdiciado / v.material_usado) * 100; return {value: val, unit:' %', interpretation:'% de desperdicio.'}; }
+
+        case 'porcentaje_defectos': { const val = (v.defectuosas / v.inspeccionadas) * 100; return {value: val, unit:' %', interpretation:'% de defectos.'}; }
+        case 'indice_retrabajo': { const val = (v.retrabajadas / v.producidas) * 100; return {value: val, unit:' %', interpretation:'% de retrabajo.'}; }
+
+        default: return {value: NaN, unit:'', interpretation:'Indicador no implementado.'};
+      }
+    }
+
+    // ====== Reglas simples de interpretación por rangos ======
+    function interpretRange(val, type){
+      if(!isFinite(val)) return '';
+      if(type==='roa'){ if(val>0.08) return 'Buen rendimiento de activos.'; if(val>=0.03) return 'Rendimiento moderado.'; return 'Bajo rendimiento de activos.'; }
+      if(type==='margen_operativo'){ if(val>0.10) return 'Margen operativo sano.'; return 'Margen operativo bajo.'; }
+      if(type==='razon_corriente'){ if(val>1.5) return 'Buena liquidez.'; if(val>=1) return 'Liquidez aceptable.'; return 'Baja liquidez.'; }
+      if(type==='endeudamiento'){ if(val<0.5) return 'Baja dependencia de deuda.'; if(val<=0.7) return 'Endeudamiento moderado.'; return 'Alto endeudamiento.'; }
+      return '';
+    }
+
+    // ====== IA contextual para Colombia (reglas explicativas) ======
+    function aiColombia(indId, value, catId){
+      const v = Number(value);
+      // Mensajes por indicador clave
+      switch(indId){
+        case 'margen_operativo':
+          return (v<0.05)
+            ? 'En Colombia, revise costos operacionales (nómina y parafiscales, logística y energía) y la correcta causación de impuestos (IVA/retenciones) que pueden estar comprimiendo el margen.'
+            : (v<0.10)
+              ? 'Sugerencia: optimice estructura de costos y negocie con proveedores locales; cuide el precio final en COP frente a inflación.'
+              : 'Mantenga control de costos y política de precios en COP; evalúe contratos con ajustes por IPC.';
+        case 'liquidez_razon_corriente':
+          return (v<1)
+            ? 'Riesgo de iliquidez para obligaciones en Colombia (proveedores, nómina, aportes y retenciones). Considere rotar cartera y líneas de crédito rotativo en COP.'
+            : 'Liquidez adecuada; vigile plazos de cartera vs. pagos fiscales y de nómina para no tensionar caja.';
+        case 'endeudamiento_ratio':
+          return (v>0.7)
+            ? 'Apalancamiento elevado: sensibilidad alta a tasas del Banco de la República. Evalúe prepago de deuda cara y uso de tasa fija.'
+            : 'Endeudamiento manejable; compare costo efectivo de la deuda en COP frente al retorno del negocio.';
+        case 'roi':
+          return (v<=0)
+            ? 'El proyecto no cubre el costo de capital. Revise supuestos de demanda, costo en COP y carga tributaria.'
+            : 'ROI positivo; valide recuperación frente a alternativas de inversión locales y costo de la deuda.';
+        case 'rentabilidad_roa':
+          return (v<0.03)
+            ? 'ROA bajo: activos ociosos o costos altos. Revise utilización de activos, mantenimiento y productividad.'
+            : 'ROA razonable; procure mayor rotación de activos e inversión donde haya retorno claro.';
+        case 'capital_trabajo_neto':
+          return (v<0)
+            ? 'Capital de trabajo negativo: riesgo de atrasos con proveedores y obligaciones. Acelere recaudo, renegocie plazos y gestione inventario.'
+            : 'Capital de trabajo positivo; mantenga políticas de crédito y abastecimiento acordes al ciclo de caja.';
+        case 'tasa_conversion':
+          return (v<2)? 'Conversión baja: mejore segmentación y oferta de valor; revise impuestos/retenciones que afectan el precio final en ecommerce.' : 'Conversión saludable; escale campañas cuidando CAC en COP.';
+        case 'cac':
+          return 'Compare el CAC en COP contra LTV neto de costos e impuestos; si supera el margen bruto unitario, reduzca pujas o cambie canales.';
+        case 'roas':
+          return (v<=1)? 'ROAS ≤ 1: está perdiendo dinero. Ajuste creatividades, audiencias y mix de canales en Colombia.' : 'ROAS positivo; pruebe escalamiento gradual cuidando saturación.';
+        case 'tiempos_entrega':
+          return (v>3)? 'Entregas lentas: la logística urbana en Colombia puede afectar SLA; use bodegas intermedias y rutas optimizadas.' : 'Entrega ágil; mantenga acuerdos con transportadoras locales.';
+        case 'inventario_disponible_vs_requerido':
+          return (v<1)? 'Riesgo de quiebre de stock; importaciones y tiempos logísticos locales pueden demorar reposición.' : 'Cobertura suficiente; revise rotación y costos de almacenamiento.';
+        case 'nps':
+          return (v<=0)? 'Alerta NPS: atienda causas raíz y tiempos de respuesta; clientes colombianos valoran canales de WhatsApp y atención oportuna.' : 'Lealtad positiva; fomente referidos y programas de fidelización.';
+        default:
+          // Mensaje general por categoría
+          const general = {
+            finanzas: 'Considere efectos de inflación, tasas del Banco de la República y obligaciones tributarias locales sobre el flujo de caja.',
+            productividad: 'Estándarice procesos y controle costos de energía y mantenimiento.',
+            talento_humano: 'Tenga en cuenta prestaciones y parafiscales al evaluar iniciativas de RR. HH.',
+            operaciones: 'Priorice eliminación de cuellos de botella y negociación con proveedores locales.',
+            marketing: 'Evalúe desempeño por canal y costos en COP; cuide el aporte al margen.',
+            ventas: 'Alinee metas con disponibilidad de inventario y tiempos reales de entrega.',
+            logistica: 'Optimice última milla y empaque; reduzca costos por devolución.',
+            atencion_cliente: 'Responda por canales preferidos (WhatsApp/Correo) y mida satisfacción.',
+            innovacion: 'Enfoque I+D donde impacte ingresos y margen con rapidez.',
+            sostenibilidad: 'Revise normativas ambientales aplicables y oportunidades de ahorro energético.',
+            ciberseguridad: 'Fortalezca respaldos, MFA y capacitación frente a phishing.',
+            transformacion_digital: 'Digitalice procesos críticos y gestione adopción con entrenamiento.',
+            gestion_proyectos: 'Controle alcance, cronograma y riesgos con reportes periódicos.',
+            produccion: 'Reduzca paradas y desperdicio; mida OEE.',
+            calidad: 'Implemente control estadístico y acciones correctivas rápidas.'
+          };
+          return general[catId] || '';
+      }
+    }
+
+    // ====== Utils ======
+    function formatNumber(x){
+      if(!isFinite(x)) return 'N/A';
+      const a = Math.abs(x);
+      if(a>=1000000000) return (x/1e9).toFixed(2)+' B';
+      if(a>=1000000) return (x/1e6).toFixed(2)+' M';
+      if(a>=1000) return (x/1e3).toFixed(2)+' K';
+      return (Math.round(x*1000000)/1000000).toString();
+    }
+  })();
+  </script>
+  <!-- Botón flotante para volver al inicio -->
+<button id="btnCerrarIndicadores" 
+        style="position:fixed; 
+               top:22px; 
+               right:22px; 
+               z-index:999;
+               padding:12px 20px;
+               font-size:15px;
+               border-radius:12px;
+               box-shadow:0 6px 20px rgba(0,0,0,0.2);
+               background:white;
+               border:2px solid #003366;
+               color:#003366;
+               font-weight:600;
+               cursor:pointer;">
+  Regresar
+</button>
+
+
+<script>
+  // Redirigir al index principal al hacer clic
+  document.getElementById('btnCerrarIndicadores').addEventListener('click', function() {
+    window.location.href = 'index.html'; 
+  });
+</script>
+
+</body>
+</html>
+
